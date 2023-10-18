@@ -1,4 +1,5 @@
 import time
+from search import aStarSearch
 
 class EightPuzzleState:
     def __init__(self, puzzle): # puzzle is 1d for simplicity, convert to 2d in init
@@ -105,8 +106,9 @@ if __name__ == '__main__':
     puzzle = [0, 2, 3, 1, 4, 5, 6, 7, 8]
     state = EightPuzzleState(puzzle)
     print(state)
-    for s, d in state.nextStates():
-        print(s, d)
+    #for s, d in state.nextStates():
+    #    print(s, d)
+    aStarSearch(state)
     """
     function = bfs
     agent = EightPuzzleAgent(state, function)
