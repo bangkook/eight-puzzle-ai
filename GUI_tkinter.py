@@ -46,7 +46,10 @@ class EightPuzzleApp:
                     canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=str(num), font=("Arial", 36), fill="white")
 
         back_button = tk.Button(puzzle_display, text="Back", command=puzzle_display.destroy, font=("Arial", 18), bg="#7FB3D5")
-        back_button.pack(pady=20)
+        back_button.pack(side=tk.LEFT, padx=20, pady=20)
+
+        next_button = tk.Button(puzzle_display, text="Next", font=("Arial", 18), bg="#7FB3D5")
+        next_button.pack(side=tk.RIGHT, padx=20, pady=20)
 
 if __name__ == "__main__":
     root = tk.Tk()
