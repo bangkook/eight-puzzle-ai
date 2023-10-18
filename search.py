@@ -1,6 +1,5 @@
 import heapq as heap
 from sre_constants import SUCCESS
-from eightpuzzle import isGoal
 """
     Each search function:
     1- takes state as input.
@@ -9,8 +8,39 @@ from eightpuzzle import isGoal
 """
 
 def breadthFirstSearch(initialState):
-    # TO BE IMPLEMNTED
-    pass
+    vis = dict()
+    frontier = []
+    frontier.insert(0, (initialState, 0)) # (state, depth)
+    vis[initialState.board] = True
+    actions = list()
+    pathTo = dict()
+    expanded = []
+    depth = 0
+
+    while len(frontier) > 0:
+        curState, curDepth = frontier.pop()
+        expanded.append(curState.board)
+
+        #print(curState.board)
+        depth = max(depth, curDepth)
+
+        if curState.isGoal():
+            board = curState.board
+            actions.append(board)
+            while board in pathTo.keys():
+                board, _ = pathTo[board]
+                actions.append(board)
+            return actions[::-1], len(actions), expanded, depth
+
+        for neighbor in curState.nextStates():
+            state, direction = neighbor
+            if state.board not in vis.keys():
+                frontier.insert(0, (state, 1 + curDepth))
+                vis[state.board] = True
+                pathTo[state.board] = (curState.board, direction)
+
+    return [], len(actions), expanded, depth
+
 
 def depthFirstSearch(initialState):
     # TO BE IMPLEMNTED
