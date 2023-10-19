@@ -62,12 +62,7 @@ class Parent:
     def __lt__(self, other): # to sort the heap
         return self.total_cost() < other.total_cost()
 
-def ConstructPath(State):
-    path = []
-    while State:
-        State.insert(0, (State.state, State.action))
-        State = State.parent
-    return path
+
 
 def manhattan_distance(state):
     # Calculate Manhattan distance heuristic
@@ -79,39 +74,67 @@ def manhattan_distance(state):
         distance = distance + abs(current_i - goal_i) + abs(current_j - goal_j)
     return distance
 
+def ConstructPath(State):
+    path = []
+    while State:
+        State.insert(0, (State.state, State.action))
+        State = State.parent
+    return path
 
 def aStarSearch(initialState):
-
     
     frontier = []
     explore = set()
+    path = []
+
     initial_node = Parent(state=initialState, parent=initialState, cost=0, heuristic=manhattan_distance(initialState.board))
     heap.heappush(frontier, (initial_node.total_cost(), initial_node)) #push in frontier: which heuristic method, cost, initial state and the path 
 
-    while frontier:
-        print("NODE: ")
-        for node in heap.nsmallest(len(frontier), frontier):
-            parent = node[1]  # The second element of the tuple contains the Parent object
-            print(parent.state)
+    i = 5
+    while i: #frontier
+        print("i: ", i)
+
+        #print("NODE: ")
+        #for node in heap.nsmallest(len(frontier), frontier):
+        #    parent = node[1]  # The second element of the tuple contains the Parent object
+        #    print(parent.state)
 
         _,currentState = heap.heappop(frontier)
+        print("Currnet STATE: ",currentState.state)
         if(currentState.state.isGoal()):
-             return ConstructPath(currentState)
-        
+            path = ConstructPath(currentState)
+            return [], 0, initialState, 1
+
         explore.add(currentState.state)
+        
+        print("explore: ")
+        for statess in explore:
+            print(statess)
+        print("---------------")
 
         for neighbor in currentState.state.nextStates():
             state, direction = neighbor
-            if state not in frontier and neighbor not in explore:
+
+            print("STATE: ",state)
+
+            print(state not in explore)
+
+            if state not in frontier and state not in explore:
                 newCost = currentState.cost + 1
                 neighborNode = Parent(state=state, parent=currentState.state, cost=newCost, heuristic=manhattan_distance(state.board))
+                #print(neighborNode.state)
+                #print(neighborNode.total_cost())
                 heap.heappush(frontier, (neighborNode.total_cost(), neighborNode))
                 
+
             elif neighbor in frontier:
                 if neighbor.cost < frontier[neighbor].cost: #review
                     newCost = neighbor.cost
                     neighborNode = Parent(state=state, parent=currentState.state, cost=newCost, heuristic=manhattan_distance(state.board))
-                    heap.heappush(frontier, (neighborNode.total_cost(), neighborNode))     
+                    #print(neighborNode.state)
+                    #print(neighborNode.total_cost())
+                    heap.heappush(frontier, (neighborNode.total_cost(), neighborNode))
+        i = i - 1
 
     return [], 0, initialState, 1
         

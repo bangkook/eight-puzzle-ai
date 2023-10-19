@@ -1,2 +1,2 @@
-for state in actions:
-    #     print(asciiBoard(state))
+ + dy[i]
+            if(self._isValid(newX, newY)):
