@@ -103,6 +103,7 @@ def aStarSearch(initialState):
         _,currentState = heap.heappop(frontier)
         # print("Currnet STATE: ",currentState.state)
         if(currentState.state.isGoal()):
+            print("FINAL PATH", currentState.state.board)
             # path = ConstructPath(currentState)
             return [], 0, initialState, 1
 
@@ -123,7 +124,7 @@ def aStarSearch(initialState):
             if (_, state) not in frontierSet and state.board not in explore:
                 newCost = currentState.cost + 1
                 neighborNode = Parent(state=state, parent=currentState.state, cost=newCost, heuristic=manhattan_distance(state.board))
-                #print(neighborNode.state)
+                #print(neighborNode.state.board)
                 #print(neighborNode.total_cost())
                 heap.heappush(frontier, (neighborNode.total_cost(), neighborNode))
                 
