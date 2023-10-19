@@ -1,5 +1,4 @@
 import heapq as heap
-from sre_constants import SUCCESS
 """
     Each search function:
     1- takes state as input.
@@ -19,6 +18,7 @@ def breadthFirstSearch(initialState):
 
     while len(frontier) > 0:
         curState, curDepth = frontier.pop()
+        
         expanded.append(curState.board)
 
         depth = max(depth, curDepth)
@@ -45,36 +45,97 @@ def depthFirstSearch(initialState):
     pass
 
 
-def neighbors(state):
-    # TO BE IMPLEMNTED
-    return 
+class Parent:
+    def __init__(self, state, parent=None, cost=0, heuristic=0):
+        self.state = state
+        self.parent = parent
+        self.cost = cost
+        self.heuristic = heuristic
 
-def aStarSearch(initialState, heuristic):
-    # TO BE IMPLEMNTED
+    def total_cost(self):
+        return self.cost + self.heuristic
     
-    initialState = initialState.board
+    def __lt__(self, other): # to sort the heap
+        return self.total_cost() < other.total_cost()
+
+
+
+def manhattan_distance(state):
+    # Calculate Manhattan distance heuristic
+    distance = 0
+    for i in range(9):
+        tile = int(state[i])
+        goal_i, goal_j = tile // 3,tile % 3
+        current_i, current_j = i // 3, i % 3
+        distance = distance + abs(current_i - goal_i) + abs(current_j - goal_j)
+    return distance
+
+# def ConstructPath(State):
+#     path = []
+#     while State:
+#         State.insert(0, (State.state, State.action))
+#         State = State.parent
+#     return path
+
+def aStarSearch(initialState):
+    
     frontier = []
+    frontierSet = set()
     explore = set()
-    
-    heap.heappush(frontier, (heuristic(initialState), 0, initialState, [])) #push in frontier: which heuristic method, cost, initial state and the path 
+    path = []
 
-    while frontier:
-        _,cost, currentState, path = heap.heappop(frontier)
+    initial_node = Parent(state=initialState, parent=initialState, cost=0, heuristic=manhattan_distance(initialState.board))
+    heap.heappush(frontier, (initial_node.total_cost(), initial_node)) #push in frontier: which heuristic method, cost, initial state and the path 
+    frontierSet.add((initial_node.total_cost(), initialState))
 
-        if(isGoal(currentState)):
-            return path
+    i = 5
+    while frontier: #frontier
+        # print("i: ", i)
+        # print(frontierSet)
+        #print("NODE: ")
+        #for node in heap.nsmallest(len(frontier), frontier):
+        #    parent = node[1]  # The second element of the tuple contains the Parent object
+        #    print(parent.state)
+        _,currentState = heap.heappop(frontier)
+        # print("Currnet STATE: ",currentState.state)
+        if(currentState.state.isGoal()):
+            print("FINAL PATH", currentState.state.board)
+            # path = ConstructPath(currentState)
+            return [], 0, initialState, 1
 
-        explore.add(currentState)
+        explore.add(currentState.state.board)
+        
+        # print("explore: ")
+        # for statess in explore:
+        #     print(statess)
+        # print("---------------")
 
-        for neighbor in neighbors(currentState):
-            if neighbor not in frontier and neighbor not in explore:
-                newCost = cost + 1
-                heap.heappush(frontier, (newCost + heuristic(initialState), newCost , neighbor, path + [neighbor]))
+        # print("frontier: ")
+        # for node in frontier:
+        #     print(node[1].state.board)
 
-            elif neighbor in frontier:
-                frontier.decreaseKey(neighbor)
+        
+        for state in currentState.state.nextStates():
+            #state, direction = neighbor
+            if (_, state) not in frontierSet and state.board not in explore:
+                newCost = currentState.cost + 1
+                neighborNode = Parent(state=state, parent=currentState.state, cost=newCost, heuristic=manhattan_distance(state.board))
+                #print(neighborNode.state.board)
+                #print(neighborNode.total_cost())
+                heap.heappush(frontier, (neighborNode.total_cost(), neighborNode))
+                
 
-    return "FAILURE"            
+            # elif neighbor in frontier:
+            #     if neighbor.cost < frontier[neighbor].cost: #review
+            #         newCost = neighbor.cost
+            #         neighborNode = Parent(state=state, parent=currentState.state, cost=newCost, heuristic=manhattan_distance(state.board))
+            #         #print(neighborNode.state)
+            #         #print(neighborNode.total_cost())
+            #         heap.heappush(frontier, (neighborNode.total_cost(), neighborNode))
+        i = i - 1
+
+    return [], 0, initialState, 1
+        
 
 # Abbreviations
 bfs = breadthFirstSearch
