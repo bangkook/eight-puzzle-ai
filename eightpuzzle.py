@@ -105,19 +105,6 @@ class EightPuzzleAgent:
 if __name__ == '__main__':
     puzzle =  [1, 2, 3, 4, 5, 0, 6, 7, 8]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     state = EightPuzzleState(puzzle)
     #print(state)
     #for s in state.nextStates():
