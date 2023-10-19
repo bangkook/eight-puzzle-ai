@@ -21,25 +21,23 @@ def breadthFirstSearch(initialState):
         curState, curDepth = frontier.pop()
         expanded.append(curState.board)
 
-        #print(curState.board)
         depth = max(depth, curDepth)
 
         if curState.isGoal():
             board = curState.board
             actions.append(board)
             while board in pathTo.keys():
-                board, _ = pathTo[board]
+                board = pathTo[board]
                 actions.append(board)
-            return actions[::-1], len(actions), expanded, depth
+            return actions[::-1], len(actions) - 1, expanded, depth
 
-        for neighbor in curState.nextStates():
-            state, direction = neighbor
+        for state in curState.nextStates():
             if state.board not in vis.keys():
                 frontier.insert(0, (state, 1 + curDepth))
                 vis[state.board] = True
-                pathTo[state.board] = (curState.board, direction)
+                pathTo[state.board] = curState.board
 
-    return [], len(actions), expanded, depth
+    return [], 100000000, expanded, depth
 
 
 def depthFirstSearch(initialState):
