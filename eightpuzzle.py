@@ -103,14 +103,28 @@ class EightPuzzleAgent:
         return self.endTime - self.startTime
 
 if __name__ == '__main__':
-    puzzle = [8, 0, 6, 5, 4, 7, 2, 3, 1]
+    puzzle =  [1, 2, 3, 4, 5, 0, 6, 7, 8]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     state = EightPuzzleState(puzzle)
     #print(state)
     #for s in state.nextStates():
         #print(s)
     #aStarSearch(state)
     
-
+    #function = breadthFirstSearch
     function = aStarSearch
     agent = EightPuzzleAgent(state, function)
     actions = agent.getActions()
