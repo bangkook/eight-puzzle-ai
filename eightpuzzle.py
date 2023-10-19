@@ -29,7 +29,7 @@ class EightPuzzleState:
             newX = x + dx[i]
             newY = y + dy[i]
             if(self._isValid(newX, newY)):
-                nextStates.append((self._applyMove(3 * newX + newY), directions[i]))
+                nextStates.append(self._applyMove(3 * newX + newY))
         
         return nextStates
 
@@ -49,10 +49,7 @@ class EightPuzzleState:
         
     # A goal is reached when the cell value equals the cell index in 1d array
     def isGoal(self):
-        for i in range(len(self.board)):
-            if(self.board[i] != str(i)):
-                return False
-        return True
+        return self.board == '012345678'
 
     def __str__(self):
         return asciiBoard(self.board)
@@ -108,9 +105,9 @@ class EightPuzzleAgent:
 if __name__ == '__main__':
     puzzle = [8, 0, 6, 5, 4, 7, 2, 3, 1]
     state = EightPuzzleState(puzzle)
-    print(state)
-    #for s, d in state.nextStates():
-        #print(s, d)
+    #print(state)
+    #for s in state.nextStates():
+        #print(s)
     #aStarSearch(state)
     function = breadthFirstSearch
     agent = EightPuzzleAgent(state, function)
