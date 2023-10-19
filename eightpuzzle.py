@@ -1,5 +1,5 @@
 import time
-from search import breadthFirstSearch
+from search import breadthFirstSearch, aStarSearch
 class EightPuzzleState:
     def __init__(self, puzzle): # puzzle is 1d for simplicity, convert to 2d in init
         self.board = ""
@@ -109,19 +109,27 @@ if __name__ == '__main__':
     puzzle = [8, 0, 6, 5, 4, 7, 2, 3, 1]
     state = EightPuzzleState(puzzle)
     print(state)
+
     #for s, d in state.nextStates():
         #print(s, d)
     #aStarSearch(state)
-    function = breadthFirstSearch
+    
+
+    function = aStarSearch
     agent = EightPuzzleAgent(state, function)
     actions = agent.getActions()
 
     #print(state)
-    for state in actions:
-        print(asciiBoard(state))
-    #print(actions[-1])
-    print("Cost = ", agent.getCost())
-    #print("Expanded Nodes = ", agent.getExpandedNodes())
-    print("Search Depth = ", agent.getDepth())
-    print("Total Time = ", agent.getTime())
+
+    # for state in actions:
+    #     print(asciiBoard(state))
+
+    # print(actions[-1])
+
+    # print("Cost = ", agent.getCost())
+
+    # print("Expanded Nodes = ", agent.getExpandedNodes())
+
+    # print("Search Depth = ", agent.getDepth())
+    # print("Total Time = ", agent.getTime())
     
