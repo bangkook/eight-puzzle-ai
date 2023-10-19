@@ -1,3 +1,2 @@
-     # if not self.validate_input():
-        #     messagebox.showerror("Invalid Input", "Please enter a valid puzzle configuration.")
-        #     return
+ + dy[i]
+            if(self._isValid(newX, newY)):
