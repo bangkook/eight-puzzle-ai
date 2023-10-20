@@ -13,6 +13,8 @@ class EightPuzzleState:
         return x >= 0 and x < 3 and y >= 0 and y < 3
 
 
+    def __lt__(self, other):
+        return True
     def nextStates(self):
         """
             Returns list of next (state, move) for this state.
@@ -86,7 +88,7 @@ class EightPuzzleAgent:
         self.startTime = time.time() 
         self.actions, self.cost, self.expandedNodes, self.depth = searchFunc(initialState)
         self.endTime = time.time()
-
+        
     def getActions(self):
         return self.actions
 

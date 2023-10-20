@@ -49,18 +49,18 @@ def depthFirstSearch(initialState):
     pass
 
 
-class Parent:
-    def __init__(self, state, parent=None, cost=0, heuristic=0):
-        self.state = state
-        self.parent = parent
-        self.cost = cost
-        self.heuristic = heuristic
+# class Parent:
+#     def __init__(self, state, parent=None, cost=0, heuristic=0):
+#         self.state = state
+#         self.parent = parent
+#         self.cost = cost
+#         self.heuristic = heuristic
 
-    def total_cost(self):
-        return self.cost + self.heuristic
+#     def total_cost(self):
+#         return self.cost + self.heuristic
     
-    def __lt__(self, other): # to sort the heap
-        return self.total_cost() < other.total_cost()
+#     def __lt__(self, other): # to sort the heap
+#         return self.total_cost() < other.total_cost()
 
 # def ConstructPath(State):
 #     path = []
@@ -69,44 +69,102 @@ class Parent:
 #         State = State.parent
 #     return path
 
+# def aStarSearch(initialState):
+#     frontier = []  # Priority queue (min-heap)
+#     frontierSet = set()  # Set to check if a state is in the frontier
+#     explore = set()
+#     path = []
+
+#     initial_node = Parent(state=initialState, parent=initialState, cost=0, heuristic=heuristics.manhattanHeuristic(initialState.board))
+#     heap.heappush(frontier, (initial_node.total_cost(), initial_node))
+#     frontierSet.add((initial_node.total_cost(), initial_node))
+
+#     while frontier:
+#         print("1")
+#         cost, currentState = heap.heappop(frontier)
+#         frontierSet.remove((cost, currentState))
+#         if currentState.state.isGoal():
+#             print("FINAL PATH", currentState.state.board)
+#             return [], 0, initialState, 1
+
+#         explore.add(currentState.state.board)
+
+#         for state in currentState.state.nextStates():
+#             s = Parent(state=state, parent=currentState, cost=currentState.cost + 1, heuristic=heuristics.manhattanHeuristic(state.board))
+#             if (s.total_cost, s) not in frontierSet and state.board not in explore:
+#                 newCost = currentState.cost + 1
+#                 neighborNode = Parent(state=state, parent=currentState.state, cost=newCost, heuristic=heuristics.manhattanHeuristic(state.board))
+#                 heap.heappush(frontier, (neighborNode.total_cost(), neighborNode))
+#                 frontierSet.add((neighborNode.total_cost(), neighborNode))
+#             elif (s.total_cost, s) in frontierSet:
+#                 print("here")
+#                 costOfState = heuristics.manhattanHeuristic(state.board)
+#                 if costOfState < frontierSet[state].total_cost(): #review
+#                     newCost = costOfState + 1
+#                     neighborNode = Parent(state=state, parent=currentState.state, cost=newCost, heuristic=heuristics.manhattanHeuristic(state.board))
+#                     heap.heappush(frontier, (neighborNode.total_cost(), neighborNode))
+#                     frontierSet.add((neighborNode.total_cost(), neighborNode))
+
+#     return [], 0, initialState, 1
+
+
+
 def aStarSearch(initialState):
     frontier = []  # Priority queue (min-heap)
     frontierSet = set()  # Set to check if a state is in the frontier
     explore = set()
-    path = []
-
-    initial_node = Parent(state=initialState, parent=initialState, cost=0, heuristic=heuristics.manhattanHeuristic(initialState.board))
-    heap.heappush(frontier, (initial_node.total_cost(), initial_node))
-    frontierSet.add((initial_node.total_cost(), initial_node))
-
+    parentM = {}
+    parentM[initialState] = (initialState, heuristics.manhattanHeuristic(initialState.board))
+    actions = list()
+    # Add depth tracking
+    depth = {initialState: 0}
+    
+    heap.heappush(frontier, (heuristics.manhattanHeuristic(initialState.board), 0, initialState))
+    frontierSet.add((heuristics.manhattanHeuristic(initialState.board), 0, initialState))
+    
     while frontier:
-        print("1")
-        cost, currentState = heap.heappop(frontier)
-        frontierSet.remove((cost, currentState))
-        if currentState.state.isGoal():
-            print("FINAL PATH", currentState.state.board)
-            return [], 0, initialState, 1
+        cost, currentDepth, currentState = heap.heappop(frontier)
+        frontierSet.remove((cost, currentDepth, currentState))
+        
+        if currentState.isGoal():
+            print("FINAL PATH", currentState.board)
+            board = currentState
+            actions.append(board)
+            while board in parentM.keys():
+                parent_state, _ = parentM[board]
+                del parentM[board]
+                actions.append(parent_state)
+                board = parent_state
+            actions.reverse()  
+            for action in actions:
+                print("Actions:", action)
+            print("Cost:", cost)
+            print("Explore:", explore)
+            print("Depth:", depth[currentState])
+            return actions, cost, explore, depth[currentState]
+        
+        explore.add(currentState.board)
 
-        explore.add(currentState.state.board)
-
-        for state in currentState.state.nextStates():
-            s = Parent(state=state, parent=currentState, cost=currentState.cost + 1, heuristic=heuristics.manhattanHeuristic(state.board))
-            if (s.total_cost, s) not in frontierSet and state.board not in explore:
-                newCost = currentState.cost + 1
-                neighborNode = Parent(state=state, parent=currentState.state, cost=newCost, heuristic=heuristics.manhattanHeuristic(state.board))
-                heap.heappush(frontier, (neighborNode.total_cost(), neighborNode))
-                frontierSet.add((neighborNode.total_cost(), neighborNode))
-            elif (s.total_cost, s) in frontierSet:
+        for state in currentState.nextStates():
+            newDepth = currentDepth + 1
+            newCost = newDepth + heuristics.manhattanHeuristic(state.board)
+            
+            if (newCost, newDepth, state) not in frontierSet and state.board not in explore:
+                heap.heappush(frontier, (newCost, newDepth, state))
+                frontierSet.add((newCost, newDepth, state))
+                parentM[state] = (currentState, newCost)
+                depth[state] = newDepth
+            elif (any, newDepth, state) in frontierSet:
                 print("here")
-                costOfState = heuristics.manhattanHeuristic(state.board)
-                if costOfState < frontierSet[state].total_cost(): #review
-                    newCost = costOfState + 1
-                    neighborNode = Parent(state=state, parent=currentState.state, cost=newCost, heuristic=heuristics.manhattanHeuristic(state.board))
-                    heap.heappush(frontier, (neighborNode.total_cost(), neighborNode))
-                    frontierSet.add((neighborNode.total_cost(), neighborNode))
+                if newCost < frontierSet[state][0]:
+                    heap.heappush(frontier, (newCost, newDepth, state))
+                    frontierSet.add((newCost, newDepth, state))
+                    parentM[state] = (currentState, newCost)
+                    depth[state] = newDepth
 
-    return [], 0, initialState, 1
+    return [], 1000000, explore, 0
 
+    
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
