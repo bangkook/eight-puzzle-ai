@@ -86,11 +86,17 @@ class EightPuzzleGame:
 class EightPuzzleAgent:
     def __init__(self, initialState, searchFunc):
         self.startTime = time.time() 
-        self.actions, self.cost, self.expandedNodes, self.depth = searchFunc(initialState)
+        self.parentMap, self.cost, self.expandedNodes, self.depth = searchFunc(initialState)
         self.endTime = time.time()
         
-    def getActions(self):
-        return self.actions
+    def getPath(self):
+        path = []
+        board = self.expandedNodes[-1]
+        path.append(board)
+        while board in self.parentMap.keys():
+            board = self.parentMap[board]
+            path.append(board)
+        return path[::-1] # reverse of path
 
     def getCost(self):
         return self.cost 
@@ -108,16 +114,13 @@ if __name__ == '__main__':
     puzzle =  [1, 2, 3, 4, 5, 0, 6, 7, 8]
 
     state = EightPuzzleState(puzzle)
-    #print(state)
-    #for s in state.nextStates():
-        #print(s)
-    #aStarSearch(state)
-    
-    #function = breadthFirstSearch
-    function = aStarSearch
-    agent = EightPuzzleAgent(state, function)
-    actions = agent.getActions()
 
+    function = breadthFirstSearch
+    #function = aStarSearch
+    agent = EightPuzzleAgent(state, function)
+    for board in agent.getPath():
+        print(asciiBoard(board))
+    
     #print(state)
 
     # for state in actions:
