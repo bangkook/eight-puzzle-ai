@@ -27,7 +27,7 @@ def breadthFirstSearch(initialState):
         depth = max(depth, curDepth)
 
         if curState.isGoal():
-            return parent, len(actions) - 1, expanded, depth
+            return parent, curDepth, expanded, depth
 
         for state in curState.nextStates():
             if state.board not in explored:
