@@ -40,26 +40,26 @@ def breadthFirstSearch(initialState):
 
 def depthFirstSearch(initialState):
     forntier = []
-    explored = set()
+    explored = []
     forntier.append((initialState,0))
-    parentMap = []
-    parentMap.append((initialState.board,initialState.board))
+    parentMap = {}
     expntier = set()
     expntier.add(initialState.board)
     searchDepth=0
     while forntier:
         curr, depth = forntier.pop()
         searchDepth=max(searchDepth,depth)
+        explored.append(curr.board)
 
         if curr.isGoal():
             return parentMap, depth, explored, searchDepth
 
-        explored.add(curr.board)
+
         for neighbor in reversed(curr.nextStates()):
             if neighbor.board not in expntier:
                 forntier.append((neighbor,depth+1))
                 expntier.add(neighbor.board)
-                parentMap.append((neighbor.board,curr.board))
+                parentMap[neighbor.board] = curr.board
 
 
     return [],100000000,explored,100000000
