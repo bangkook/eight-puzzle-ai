@@ -10,12 +10,12 @@ import heuristics
 """
 
 def breadthFirstSearch(initialState):
-    vis = dict()
+    explored = set()
     frontier = []
     frontier.insert(0, (initialState, 0)) # (state, depth)
-    vis[initialState.board] = True
+    explored.add(initialState.board)
     actions = list()
-    pathTo = dict()
+    parent = dict()
     expanded = []
     depth = 0
 
@@ -27,19 +27,13 @@ def breadthFirstSearch(initialState):
         depth = max(depth, curDepth)
 
         if curState.isGoal():
-            board = curState.board
-            actions.append(board)
-            print("finish",board)
-            while board in pathTo.keys():
-                board = pathTo[board]
-                actions.append(board)
-            return actions[::-1], len(actions) - 1, expanded, depth
+            return parent, len(actions) - 1, expanded, depth
 
         for state in curState.nextStates():
-            if state.board not in vis.keys():
+            if state.board not in explored:
                 frontier.insert(0, (state, 1 + curDepth))
-                vis[state.board] = True
-                pathTo[state.board] = curState.board
+                explored.add(state.board)
+                parent[state.board] = curState.board
 
     return [], 100000000, expanded, depth
 
