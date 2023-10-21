@@ -1,5 +1,7 @@
 import time
-from search import breadthFirstSearch, aStarSearch,depthFirstSearch
+from search import *
+from heuristics import *
+
 class EightPuzzleState:
     def __init__(self, puzzle): # puzzle is 1d for simplicity, convert to 2d in init
         self.board = ""
@@ -84,14 +86,19 @@ class EightPuzzleGame:
         return state.isGoal()
 
 class EightPuzzleAgent:
-    def __init__(self, initialState, searchFunc):
-        self.startTime = time.time() 
-        self.parentMap, self.cost, self.expandedNodes, self.depth = searchFunc(initialState)
+    def __init__(self, initialState, fn, heuristic=lambda x : 0):
+        if fn.__name__ == 'aStarSearch':
+            self.searchFunc = lambda x : fn(x, heuristic)
+        else:
+            self.searchFunc = fn
+
+        self.startTime = time.time()
+        self.parentMap, self.cost, self.expandedNodes, self.depth = self.searchFunc(initialState)
         self.endTime = time.time()
         
     def getPath(self):
         path = []
-        board = self.expandedNodes[-1]
+        board = '012345678' #self.expandedNodes[-1]
         path.append(board)
         while board in self.parentMap.keys():
             board = self.parentMap[board]
@@ -116,23 +123,14 @@ if __name__ == '__main__':
     state = EightPuzzleState(puzzle)
 
     #function = breadthFirstSearch
-    #function = aStarSearch
-    function=depthFirstSearch
-    agent = EightPuzzleAgent(state, function)
+    function = aStarSearch
+    #function=depthFirstSearch
+    agent = EightPuzzleAgent(state, function, heuristic=euclideanHeuristic)
     for board in agent.getPath():
         print(asciiBoard(board))
-    
-    #print(state)
 
-    # for state in actions:
-    #     print(asciiBoard(state))
-
-    # print(actions[-1])
-
-    # print("Cost = ", agent.getCost())
-
-    # print("Expanded Nodes = ", agent.getExpandedNodes())
-
-    # print("Search Depth = ", agent.getDepth())
-    # print("Total Time = ", agent.getTime())
+    print("Cost = ", agent.getCost())
+    print("Expanded Nodes = ", len(agent.getExpandedNodes()))
+    print("Search Depth = ", agent.getDepth())
+    print("Total Time = ", agent.getTime())
     

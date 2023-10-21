@@ -1,7 +1,7 @@
 import heapq as heap
 import sys
 sys.path.append('../')
-import heuristics
+
 """
     Each search function:
     1- takes state as input.
@@ -130,18 +130,18 @@ def depthFirstSearch(initialState):
 
 
 
-def aStarSearch(initialState):
+def aStarSearch(initialState, heuristic):
     frontier = []  # Priority queue (min-heap)
     frontierSet = set()  # Set to check if a state is in the frontier
     explore = set()
     parentM = {}
-    parentM[initialState] = (initialState, heuristics.manhattanHeuristic(initialState.board))
+    parentM[initialState] = (initialState, heuristic(initialState.board))
     actions = list()
     # Add depth tracking
     depth = {initialState: 0}
     
-    heap.heappush(frontier, (heuristics.manhattanHeuristic(initialState.board), 0, initialState))
-    frontierSet.add((heuristics.manhattanHeuristic(initialState.board), 0, initialState))
+    heap.heappush(frontier, (heuristic(initialState.board), 0, initialState))
+    frontierSet.add((heuristic(initialState.board), 0, initialState))
     
     while frontier:
         cost, currentDepth, currentState = heap.heappop(frontier)
@@ -168,7 +168,7 @@ def aStarSearch(initialState):
 
         for state in currentState.nextStates():
             newDepth = currentDepth + 1
-            newCost = newDepth + heuristics.manhattanHeuristic(state.board)
+            newCost = newDepth + heuristic(state.board)
             
             if (newCost, newDepth, state) not in frontierSet and state.board not in explore:
                 heap.heappush(frontier, (newCost, newDepth, state))
