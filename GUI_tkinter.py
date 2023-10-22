@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
-from eightpuzzle import EightPuzzleState, asciiBoard, breadthFirstSearch, EightPuzzleAgent
+from eightpuzzle import EightPuzzleState, asciiBoard, breadthFirstSearch, depthFirstSearch, aStarSearch, EightPuzzleAgent
+from heuristics import euclideanHeuristic, manhattanHeuristic
+from tkinter import Radiobutton
 
 class EightPuzzleApp:
     def __init__(self, root):
@@ -15,7 +17,7 @@ class EightPuzzleApp:
         self.input_frame.place(relx=0.5, rely=0.5, anchor="center")
 
         self.input_puzzle = [[tk.StringVar() for _ in range(3)] for _ in range(3)]
-
+        self.puzzle_display = None 
         for i in range(3):
             for j in range(3):
                 self.input_puzzle[i][j] = tk.StringVar()
@@ -23,15 +25,21 @@ class EightPuzzleApp:
                 entry.grid(row=i, column=j, padx=5, pady=5)
 
         submit_button = tk.Button(self.input_frame, text="Submit", command=self.solve_puzzle, font=("Arial", 18), bg="#7FB3D5")
-        #submit_button = tk.Button(self.input_frame, text="Submit", command=self.display_puzzle, font=("Arial", 18), bg="#7FB3D5")
         submit_button.grid(row=7, column=1, pady=20)
 
-        search_methods = ["DFS", "BFS", "A Star"]
+        search_methods = ["DFS", "BFS", "AStar"]
         self.selected_method = tk.StringVar()
         self.selected_method.set(search_methods[0])  # Set the default method
         method_dropdown = ttk.Combobox(self.input_frame, textvariable=self.selected_method, values=search_methods)
         method_dropdown.grid(row=4, column=1, pady=20)
 
+        self.heuristic_label = tk.Label(self.input_frame, text="Heuristic:")
+        self.heuristic_label.grid(row=5, column=0, pady=5)
+        self.selected_heuristic = tk.StringVar()
+        manhattan_radio = Radiobutton(self.input_frame, text="Manhattan", variable=self.selected_heuristic, value="Manhattan")
+        manhattan_radio.grid(row=5, column=1, pady=5)
+        euclidean_radio = Radiobutton(self.input_frame, text="Euclidean", variable=self.selected_heuristic, value="Euclidean")
+        euclidean_radio.grid(row=5, column=2, pady=5)
 
         #------------
         self.results_label = tk.Label(self.input_frame, text="", font=("Arial", 12))
@@ -45,6 +53,12 @@ class EightPuzzleApp:
 
         back_button = tk.Button(self.input_frame, text="Back", command=self.show_previous_step, font=("Arial", 18), bg="#7FB3D5")
         back_button.grid(row=9, column=2, pady=10)
+
+        self.step_input = tk.Entry(self.input_frame, font=("Arial", 16))
+        self.step_input.grid(row=10, column=0, columnspan=3, pady=10)
+
+        show_step_button = tk.Button(self.input_frame, text="Show Step", command=self.show_specified_step, font=("Arial", 16), bg="#7FB3D5")
+        show_step_button.grid(row=11, column=1, pady=10)
         #------------
 
     def set_main_background(self):
@@ -54,31 +68,45 @@ class EightPuzzleApp:
 
     def solve_puzzle(self):
         selected_method = self.selected_method.get()  # Get the selected search method
+        heuristic = self.selected_heuristic.get()
+        print(selected_method)
+        print(heuristic)
 
         if selected_method == "BFS":
             function = breadthFirstSearch
-            puzzle = [[int(self.input_puzzle[i][j].get()) for j in range(3)] for i in range(3)]
-            initial_state = EightPuzzleState([puzzle[i][j] for i in range(3) for j in range(3)])
+        elif selected_method == "DFS":
+            function = depthFirstSearch
+        elif selected_method == "AStar":
+            function = aStarSearch
+
+        puzzle = [[int(self.input_puzzle[i][j].get()) for j in range(3)] for i in range(3)]
+        initial_state = EightPuzzleState([puzzle[i][j] for i in range(3) for j in range(3)])
+        if heuristic == "Manhattan":
+            agent = EightPuzzleAgent(initial_state, function, heuristic=manhattanHeuristic)
+        elif heuristic == "Euclidean":
+            agent = EightPuzzleAgent(initial_state, function, heuristic=euclideanHeuristic)
+        else:
             agent = EightPuzzleAgent(initial_state, function)
 
-            print(initial_state)
-            parent, cost, expanded_nodes, depth = breadthFirstSearch(initial_state)
+        print(initial_state)
+        parent, cost, expanded_nodes, depth = breadthFirstSearch(initial_state)
 
-            # Now you have the BFS results; you can use this data to display it in the GUI
-            print("BFS Results:")
-            print("Cost =", cost)
-            print("Expanded Nodes =", len(expanded_nodes))
-            print("Search Depth =", depth)
+        # Now you have the BFS results; you can use this data to display it in the GUI
+        print("BFS Results:")
+        print("Cost =", cost)
+        print("Expanded Nodes =", len(expanded_nodes))
+        print("Search Depth =", depth)
 
-            self.steps = agent.getPath()
+        self.steps = agent.getPath()
+        print("self.steps: ",self.steps)
 
-            actions = agent.getPath()
-            for action in actions:
-                print(asciiBoard(action))
+        # actions = agent.getPath()
+        # for action in actions:
+        #     print(asciiBoard(action))
 
-            self.show_current_step()
+        self.show_current_step()
 
-            self.results_label.config(text=f"Cost = {cost}, Expanded Nodes = {len(expanded_nodes)}, Search Depth = {depth}")
+        self.results_label.config(text=f"Cost = {cost}, Expanded Nodes = {len(expanded_nodes)}, Search Depth = {depth}")
 
     def get_solution_path(self, parent, initial_state):
         path = []
@@ -104,15 +132,29 @@ class EightPuzzleApp:
             self.current_step -= 1
             self.show_current_step()
 
-    def display_board(self, board):
-        
-        puzzle_display = tk.Toplevel(self.root)
-        puzzle_display.title("Puzzle Display")
-        puzzle_display.geometry("500x500")
-        puzzle_display.configure(bg="#FFC0CB")
+    def show_specified_step(self):
+        step_number = self.step_input.get()
+        try:
+            step_number = int(step_number)
+            if 0 <= step_number < len(self.steps):
+                self.current_step = step_number
+                self.show_current_step()
+            else:
+                messagebox.showerror("Error", "Step number out of range.")
+        except ValueError:
+            messagebox.showerror("Error", "Please enter a valid step number.")
 
-        canvas = tk.Canvas(puzzle_display, width=400, height=400)
-        canvas.pack()
+    def display_board(self, board):
+        if self.puzzle_display is None:
+            self.puzzle_display = tk.Toplevel(self.root)
+            self.puzzle_display.title("Puzzle Display")
+            self.puzzle_display.geometry("500x500")
+            self.puzzle_display.configure(bg="#FFC0CB")
+
+            self.canvas = tk.Canvas(self.puzzle_display, width=400, height=400)
+            self.canvas.pack()
+
+        self.canvas.delete("all") 
 
         for i in range(3):
             for j in range(3):
@@ -120,39 +162,10 @@ class EightPuzzleApp:
                 x1, y1 = j * 133, i * 133
                 x2, y2 = (j + 1) * 133, (i + 1) * 133
                 fill_color = "#7FB3D5"
-                canvas.create_rectangle(x1, y1, x2, y2, fill=fill_color)
+                self.canvas.create_rectangle(x1, y1, x2, y2, fill=fill_color)
                 if num != 0:
-                    canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=str(num), font=("Arial", 36), fill="white")
+                    self.canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=str(num), font=("Arial", 36), fill="white")
 
-
-    # def display_puzzle(self):
-
-    #     selected_method = self.selected_method.get()  # Get the selected search method
-    #     print("Selected Method:", selected_method)
-
-    #     puzzle_display = tk.Toplevel(self.root)
-    #     puzzle_display.title("Puzzle Display")
-    #     puzzle_display.geometry("500x500")
-    #     puzzle_display.configure(bg="#FFC0CB")  
-
-    #     canvas = tk.Canvas(puzzle_display, width=400, height=400)
-    #     canvas.pack()
-
-    #     for i in range(3):
-    #         for j in range(3):
-    #             num = int(self.input_puzzle[i][j].get())
-    #             x1, y1 = j * 133, i * 133
-    #             x2, y2 = (j + 1) * 133, (i + 1) * 133
-    #             fill_color = "#7FB3D5" 
-    #             canvas.create_rectangle(x1, y1, x2, y2, fill=fill_color)
-    #             if num != 0:
-    #                 canvas.create_text((x1 + x2) / 2, (y1 + y2) / 2, text=str(num), font=("Arial", 36), fill="white")
-
-    #     back_button = tk.Button(puzzle_display, text="Back", command=puzzle_display.destroy, font=("Arial", 18), bg="#7FB3D5")
-    #     back_button.pack(side=tk.LEFT, padx=20, pady=20)
-
-    #     next_button = tk.Button(puzzle_display, text="Next", font=("Arial", 18), bg="#7FB3D5")
-    #     next_button.pack(side=tk.RIGHT, padx=20, pady=20)
 
 if __name__ == "__main__":
     root = tk.Tk()

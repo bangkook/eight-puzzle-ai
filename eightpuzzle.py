@@ -125,8 +125,8 @@ if __name__ == '__main__':
     # function = breadthFirstSearch
     function = aStarSearch
     #function=depthFirstSearch
-    agent = EightPuzzleAgent(state, function)
-
+    #agent = EightPuzzleAgent(state, function)
+    agent = EightPuzzleAgent(state, function, heuristic=euclideanHeuristic)
     actions = agent.getPath()
 
     print(state)
@@ -139,4 +139,5 @@ if __name__ == '__main__':
     print("Expanded Nodes = ", len(agent.getExpandedNodes()))
     print("Search Depth = ", agent.getDepth())
     print("Total Time = ", agent.getTime())
+
     
