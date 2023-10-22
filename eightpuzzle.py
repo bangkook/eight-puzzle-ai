@@ -1,3 +1,4 @@
+import copy
 import time
 from search import *
 from heuristics import *
@@ -13,7 +14,6 @@ class EightPuzzleState:
     # Check if given coordinates are valid
     def _isValid(self, x, y):
         return x >= 0 and x < 3 and y >= 0 and y < 3
-
 
     def __lt__(self, other):
         return True
@@ -72,6 +72,17 @@ def asciiBoard(board):
         lines.append("-------------")
     return "\n".join(lines)
 
+def solvable(puzzle):
+    inversion_count = 0
+    p=copy.deepcopy(puzzle)
+    p.remove(0)
+    for i in range(len(p)):
+        for j in range(i + 1, len(p)):
+            if p[i] > p[j]:
+                inversion_count += 1
+
+    return inversion_count % 2 == 0
+
 class EightPuzzleGame:
     def __init__(self, initialState):
         self.initialState = initialState
@@ -117,27 +128,29 @@ class EightPuzzleAgent:
     def getTime(self):
         return self.endTime - self.startTime
 
-if __name__ == '__main__':
-    puzzle =  [1, 2, 3, 4, 5, 0, 6, 7, 8]
 
-    state = EightPuzzleState(puzzle)
+
+if __name__ == '__main__':
+    puzzle = [1, 2, 3, 4, 5, 0, 6, 7, 8]
+    print(solvable(puzzle))
+    # state = EightPuzzleState(puzzle)
 
     # function = breadthFirstSearch
-    function = aStarSearch
+    #function = aStarSearch
     #function=depthFirstSearch
-    #agent = EightPuzzleAgent(state, function)
-    agent = EightPuzzleAgent(state, function, heuristic=euclideanHeuristic)
-    actions = agent.getPath()
-
-    print(state)
-    for action in actions:
-        print(asciiBoard(action))
-    # for board in agent.getPath():
-    #     print(asciiBoard(board))
-
-    print("Cost = ", agent.getCost())
-    print("Expanded Nodes = ", len(agent.getExpandedNodes()))
-    print("Search Depth = ", agent.getDepth())
-    print("Total Time = ", agent.getTime())
+    # agent = EightPuzzleAgent(state, function)
+    #agent = EightPuzzleAgent(state, function, heuristic=euclideanHeuristic)
+    # actions = agent.getPath()
+    #
+    # print(state)
+    # for action in actions:
+    #     print(asciiBoard(action))
+    # # for board in agent.getPath():
+    # #     print(asciiBoard(board))
+    #
+    # print("Cost = ", agent.getCost())
+    # print("Expanded Nodes = ", len(agent.getExpandedNodes()))
+    # print("Search Depth = ", agent.getDepth())
+    # print("Total Time = ", agent.getTime())
 
     
