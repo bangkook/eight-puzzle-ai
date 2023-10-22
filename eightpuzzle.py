@@ -122,12 +122,18 @@ if __name__ == '__main__':
 
     state = EightPuzzleState(puzzle)
 
-    #function = breadthFirstSearch
-    function = aStarSearch
+    function = breadthFirstSearch
+    #function = aStarSearch
     #function=depthFirstSearch
-    agent = EightPuzzleAgent(state, function, heuristic=euclideanHeuristic)
-    for board in agent.getPath():
-        print(asciiBoard(board))
+    agent = EightPuzzleAgent(state, function)
+
+    actions = agent.getPath()
+
+    print(state)
+    for action in actions:
+        print(asciiBoard(action))
+    # for board in agent.getPath():
+    #     print(asciiBoard(board))
 
     print("Cost = ", agent.getCost())
     print("Expanded Nodes = ", len(agent.getExpandedNodes()))
