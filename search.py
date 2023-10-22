@@ -135,55 +135,56 @@ def aStarSearch(initialState, heuristic):
     frontierSet = set()  # Set to check if a state is in the frontier
     explore = set()
     parentM = {}
-    parentM[initialState] = (initialState, heuristic(initialState.board))
+    parentM[initialState] = initialState  # Store parent states directly
     actions = list()
     # Add depth tracking
     depth = {initialState: 0}
-    
+
     heap.heappush(frontier, (heuristic(initialState.board), 0, initialState))
     frontierSet.add((heuristic(initialState.board), 0, initialState))
-    
+
     while frontier:
         cost, currentDepth, currentState = heap.heappop(frontier)
         frontierSet.remove((cost, currentDepth, currentState))
-        
+
         if currentState.isGoal():
             print("FINAL PATH", currentState.board)
             board = currentState
             actions.append(board)
             while board in parentM.keys():
-                parent_state, _ = parentM[board]
+                parent_state = parentM[board]
                 del parentM[board]
                 actions.append(parent_state)
                 board = parent_state
-            actions.reverse()  
+            actions.reverse()
             for action in actions:
                 print("Actions:", action)
             print("Cost:", cost)
             print("Explore:", explore)
             print("Depth:", depth[currentState])
             return actions, cost, explore, depth[currentState]
-        
+
         explore.add(currentState.board)
 
         for state in currentState.nextStates():
             newDepth = currentDepth + 1
             newCost = newDepth + heuristic(state.board)
-            
+
             if (newCost, newDepth, state) not in frontierSet and state.board not in explore:
                 heap.heappush(frontier, (newCost, newDepth, state))
                 frontierSet.add((newCost, newDepth, state))
-                parentM[state] = (currentState, newCost)
+                parentM[state] = currentState  # Store the parent state directly
                 depth[state] = newDepth
             elif (any, newDepth, state) in frontierSet:
                 print("here")
                 if newCost < frontierSet[state][0]:
                     heap.heappush(frontier, (newCost, newDepth, state))
                     frontierSet.add((newCost, newDepth, state))
-                    parentM[state] = (currentState, newCost)
+                    parentM[state] = currentState  # Update the parent state
                     depth[state] = newDepth
 
     return [], 1000000, explore, 0
+
 
     
 # Abbreviations
