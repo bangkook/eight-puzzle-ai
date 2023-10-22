@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
-from eightpuzzle import EightPuzzleState, asciiBoard, breadthFirstSearch, depthFirstSearch, aStarSearch, EightPuzzleAgent
+from eightpuzzle import EightPuzzleState, asciiBoard, breadthFirstSearch, depthFirstSearch, aStarSearch, EightPuzzleAgent,solvable
 from heuristics import euclideanHeuristic, manhattanHeuristic
 from tkinter import Radiobutton
 
@@ -9,7 +9,7 @@ class EightPuzzleApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Eight Puzzle Game")
-        self.root.geometry("600x600")
+        self.root.geometry("700x700")
 
         self.set_main_background()
 
@@ -27,19 +27,11 @@ class EightPuzzleApp:
         submit_button = tk.Button(self.input_frame, text="Submit", command=self.solve_puzzle, font=("Arial", 18), bg="#7FB3D5")
         submit_button.grid(row=7, column=1, pady=20)
 
-        search_methods = ["DFS", "BFS", "AStar"]
+        search_methods = ["DFS", "BFS","AStar Manhattan", "AStar Euclidean"]
         self.selected_method = tk.StringVar()
         self.selected_method.set(search_methods[0])  # Set the default method
         method_dropdown = ttk.Combobox(self.input_frame, textvariable=self.selected_method, values=search_methods)
         method_dropdown.grid(row=4, column=1, pady=20)
-
-        self.heuristic_label = tk.Label(self.input_frame, text="Heuristic:")
-        self.heuristic_label.grid(row=5, column=0, pady=5)
-        self.selected_heuristic = tk.StringVar()
-        manhattan_radio = Radiobutton(self.input_frame, text="Manhattan", variable=self.selected_heuristic, value="Manhattan")
-        manhattan_radio.grid(row=5, column=1, pady=5)
-        euclidean_radio = Radiobutton(self.input_frame, text="Euclidean", variable=self.selected_heuristic, value="Euclidean")
-        euclidean_radio.grid(row=5, column=2, pady=5)
 
         #------------
         self.results_label = tk.Label(self.input_frame, text="", font=("Arial", 12))
@@ -68,45 +60,69 @@ class EightPuzzleApp:
 
     def solve_puzzle(self):
         selected_method = self.selected_method.get()  # Get the selected search method
-        heuristic = self.selected_heuristic.get()
         print(selected_method)
-        print(heuristic)
 
+        # if selected_method == "BFS":
+        #     function = breadthFirstSearch
+        # elif selected_method == "DFS":
+        #     function = depthFirstSearch
+        # elif selected_method == "AStar":
+        #     function = aStarSearch
+        #
+        # puzzle = [[int(self.input_puzzle[i][j].get()) for j in range(3)] for i in range(3)]
+        # eman = [puzzle[i][j] for i in range(3) for j in range(3)]
+        # if solvable(eman):
+        #     initial_state = EightPuzzleState(eman)
+        #     if heuristic == "Manhattan":
+        #         agent = EightPuzzleAgent(initial_state, function, heuristic=manhattanHeuristic)
+        #     elif heuristic == "Euclidean":
+        #         agent = EightPuzzleAgent(initial_state, function, heuristic=euclideanHeuristic)
+        #     else:
+        #         agent = EightPuzzleAgent(initial_state, function)
         if selected_method == "BFS":
             function = breadthFirstSearch
         elif selected_method == "DFS":
             function = depthFirstSearch
-        elif selected_method == "AStar":
+        elif selected_method == "AStar Manhattan" or "AStar Euclidean":
             function = aStarSearch
 
         puzzle = [[int(self.input_puzzle[i][j].get()) for j in range(3)] for i in range(3)]
-        initial_state = EightPuzzleState([puzzle[i][j] for i in range(3) for j in range(3)])
-        if heuristic == "Manhattan":
-            agent = EightPuzzleAgent(initial_state, function, heuristic=manhattanHeuristic)
-        elif heuristic == "Euclidean":
-            agent = EightPuzzleAgent(initial_state, function, heuristic=euclideanHeuristic)
+        eman = [puzzle[i][j] for i in range(3) for j in range(3)]
+        if solvable(eman):
+            initial_state = EightPuzzleState([puzzle[i][j] for i in range(3) for j in range(3)])
+            if selected_method == "AStar Manhattan":
+                agent = EightPuzzleAgent(initial_state, function, heuristic=manhattanHeuristic)
+            elif selected_method == "AStar Euclidean":
+                agent = EightPuzzleAgent(initial_state, function, heuristic=euclideanHeuristic)
+            else:
+                agent = EightPuzzleAgent(initial_state, function)
+
+            print(initial_state)
+            parent=agent.getPath()
+            cost=agent.getCost()
+            expanded_nodes= agent.getExpandedNodes()
+            depth = agent.getDepth()
+            time=agent.getTime()
+
+            # Now you have the BFS results; you can use this data to display it in the GUI
+            print("BFS Results:")
+            print("Cost =", cost)
+            print("Expanded Nodes =", len(expanded_nodes))
+            print("Search Depth =", depth)
+            print("Time =", time)
+
+            self.steps = parent
+            print("self.steps: ",self.steps)
+
+            # actions = agent.getPath()
+            # for action in actions:
+            #     print(asciiBoard(action))
+
+            self.show_current_step()
+
+            self.results_label.config(text=f"Cost = {cost}, Expanded Nodes = {len(expanded_nodes)}, Search Depth = {depth}, Time = {time}")
         else:
-            agent = EightPuzzleAgent(initial_state, function)
-
-        print(initial_state)
-        parent, cost, expanded_nodes, depth = breadthFirstSearch(initial_state)
-
-        # Now you have the BFS results; you can use this data to display it in the GUI
-        print("BFS Results:")
-        print("Cost =", cost)
-        print("Expanded Nodes =", len(expanded_nodes))
-        print("Search Depth =", depth)
-
-        self.steps = agent.getPath()
-        print("self.steps: ",self.steps)
-
-        # actions = agent.getPath()
-        # for action in actions:
-        #     print(asciiBoard(action))
-
-        self.show_current_step()
-
-        self.results_label.config(text=f"Cost = {cost}, Expanded Nodes = {len(expanded_nodes)}, Search Depth = {depth}")
+            messagebox.showerror("unsolvable","ya alel el adab")
 
     def get_solution_path(self, parent, initial_state):
         path = []
