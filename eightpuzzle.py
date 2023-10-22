@@ -122,8 +122,8 @@ if __name__ == '__main__':
 
     state = EightPuzzleState(puzzle)
 
-    function = breadthFirstSearch
-    #function = aStarSearch
+    # function = breadthFirstSearch
+    function = aStarSearch
     #function=depthFirstSearch
     agent = EightPuzzleAgent(state, function)
 
