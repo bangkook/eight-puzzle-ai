@@ -98,7 +98,7 @@ class EightPuzzleApp:
                 agent = EightPuzzleAgent(initial_state, function)
 
             print(initial_state)
-            parent=agent.getPath()
+            parent, _=agent.getPath()
             cost=agent.getCost()
             expanded_nodes= agent.getExpandedNodes()
             depth = agent.getDepth()
