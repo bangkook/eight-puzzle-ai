@@ -26,14 +26,14 @@ class EightPuzzleState:
 
         # List of tuples (state, direction)
         nextStates = []
-        directions = ['up', 'right', 'down', 'left']
-        dx = [-1, 0, 1, 0]
-        dy = [0, 1, 0, -1]
+        directions = ['up', 'down', 'left', 'right']
+        dx = [-1, 1, 0, 0]
+        dy = [0, 0, -1, 1]
         for i in range(len(directions)):
             newX = x + dx[i]
             newY = y + dy[i]
             if(self._isValid(newX, newY)):
-                nextStates.append(self._applyMove(3 * newX + newY))
+                nextStates.append((self._applyMove(3 * newX + newY), directions[i]))
         
         return nextStates
 
@@ -109,12 +109,14 @@ class EightPuzzleAgent:
         
     def getPath(self):
         path = []
+        actions = []
         board = '012345678' #self.expandedNodes[-1]
         path.append(board)
         while board in self.parentMap.keys():
-            board = self.parentMap[board]
+            board, action = self.parentMap[board]
             path.append(board)
-        return path[::-1] # reverse of path
+            actions.append(action)
+        return path[::-1], actions[::-1] # reverse
 
     def getCost(self):
         return self.cost 
@@ -131,26 +133,13 @@ class EightPuzzleAgent:
 
 
 if __name__ == '__main__':
-    puzzle = [1, 2, 3, 4, 5, 0, 6, 7, 8]
-    print(solvable(puzzle))
-    # state = EightPuzzleState(puzzle)
-
-    # function = breadthFirstSearch
+    #puzzle = [1,4,2,6,5,8,7,3,0]
+    #print(solvable(puzzle))
+    #state = EightPuzzleState(puzzle)
+    puzzles = [[8, 0, 6, 5, 4, 7, 2, 3, 1], [ 1,2,5,3,4,0,6,7,8], [1,4,2,6,5,8,7,3,0], [1,0,2,7,5,4,8,6,3]]
+    #function = breadthFirstSearch
     #function = aStarSearch
-    #function=depthFirstSearch
-    # agent = EightPuzzleAgent(state, function)
-    #agent = EightPuzzleAgent(state, function, heuristic=euclideanHeuristic)
-    # actions = agent.getPath()
-    #
-    # print(state)
-    # for action in actions:
-    #     print(asciiBoard(action))
-    # # for board in agent.getPath():
-    # #     print(asciiBoard(board))
-    #
-    # print("Cost = ", agent.getCost())
-    # print("Expanded Nodes = ", len(agent.getExpandedNodes()))
-    # print("Search Depth = ", agent.getDepth())
-    # print("Total Time = ", agent.getTime())
+    
+        
 
     
