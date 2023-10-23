@@ -29,11 +29,14 @@ def breadthFirstSearch(initialState):
         if curState.isGoal():
             return parent, curDepth, expanded, depth
 
-        for state in curState.nextStates():
+        #print(curState)
+        for state, action in curState.nextStates():
             if state.board not in explored:
+                #print(state)
                 frontier.insert(0, (state, 1 + curDepth))
                 explored.add(state.board)
-                parent[state.board] = curState.board
+                parent[state.board] = (curState.board, action)
+        #print("FINISHED")
 
     return [], 100000000, expanded, depth
 
@@ -41,28 +44,30 @@ def breadthFirstSearch(initialState):
 def depthFirstSearch(initialState):
     forntier = []
     explored = []
-    forntier.append((initialState,0))
+    forntier.append((initialState, 0))
     parentMap = {}
     expntier = set()
     expntier.add(initialState.board)
-    searchDepth=0
+    searchDepth = 0
+
     while forntier:
         curr, depth = forntier.pop()
-        searchDepth=max(searchDepth,depth)
+        searchDepth = max(searchDepth, depth)
+
         explored.append(curr.board)
 
         if curr.isGoal():
             return parentMap, depth, explored, searchDepth
 
-
-        for neighbor in reversed(curr.nextStates()):
+        #print(curr)
+        for neighbor, action in reversed(curr.nextStates()):
             if neighbor.board not in expntier:
-                forntier.append((neighbor,depth+1))
-                expntier.add(neighbor.board)
-                parentMap[neighbor.board] = curr.board
+                expntier.add(curr.board)
+                forntier.append((neighbor, depth + 1))
+                parentMap[neighbor.board] = (curr.board, action)
 
-
-    return [],100000000,explored,100000000
+        #print("FINISHED")
+    return [], 100000000, explored, searchDepth
 
 
 
@@ -71,59 +76,49 @@ def aStarSearch(initialState, heuristic):
     frontierSet = set()  # Set to check if a state is in the frontier
     explore = set()
     parentM = dict()
-    #parentM[initialState.board] = initialState.board  # Store parent states directly
     actions = list()
-    # Add depth tracking
-    depth = {initialState: 0}
+    searchDepth = 0
 
     heap.heappush(frontier, (heuristic(initialState.board), 0, initialState))
-    frontierSet.add((heuristic(initialState.board), 0, initialState))
+    frontierSet.add(initialState.board)
 
     while frontier:
         cost, currentDepth, currentState = heap.heappop(frontier)
-        frontierSet.remove((cost, currentDepth, currentState))
+        frontierSet.remove(currentState.board)
 
-        if currentState.isGoal():
-            print("FINAL PATH", currentState.board)
-            board = currentState
-            # actions.append(board)
-            # while board in parentM.keys():
-            #     parent_state = parentM[board]
-            #     del parentM[board]
-            #     actions.append(parent_state)
-            #     board = parent_state
-            # actions.reverse()
-            # for action in actions:
-            #     print("Actions:", action)
-            print("Cost:", cost)
-            print("Explore:", explore)
-            print("Depth:", depth[currentState])
-            return parentM, cost, explore, depth[currentState]
+        searchDepth = max(searchDepth, currentDepth)
 
         explore.add(currentState.board)
 
-        for state in currentState.nextStates():
+        if currentState.isGoal():
+            return parentM, currentDepth, explore, searchDepth
+
+        #print(currentState)
+        for state, action in currentState.nextStates():
             newDepth = currentDepth + 1
             newCost = newDepth + heuristic(state.board)
 
-            if (newCost, newDepth, state) not in frontierSet and state.board not in explore:
+            if state.board not in frontierSet and state.board not in explore:
                 heap.heappush(frontier, (newCost, newDepth, state))
-                frontierSet.add((newCost, newDepth, state))
-                parentM[state.board] = currentState.board  # Store the parent state directly
-                depth[state] = newDepth
-            elif (any, newDepth, state) in frontierSet:
-                print("here")
-                if newCost < frontierSet[state][0]:
-                    heap.heappush(frontier, (newCost, newDepth, state))
-                    frontierSet.add((newCost, newDepth, state))
-                    parentM[state.board] = currentState.board  # Update the parent state
-                    depth[state] = newDepth
-
-    return [], 1000000, explore, 0
+                frontierSet.add(state.board)
+                parentM[state.board] = (currentState.board, action)  # Store the parent state directly
+                #print(1, state)
+            elif state.board in frontierSet:
+                #print(2, state)
+                decreaseKey(frontier, state, newDepth, newCost, parentM, currentState.board, action)
+        #print("FINISHED")
+    return [], 1000000, explore, searchDepth
 
 
-    
-# Abbreviations
-bfs = breadthFirstSearch
-dfs = depthFirstSearch
-astar = aStarSearch
+def decreaseKey(frontier, state, depth, cost, parentMap, parent, action):
+    for i, (c, d, s) in enumerate(frontier):
+        if s.board != state.board:
+            continue
+        #print(1)
+        if c <= cost :
+            break
+        #print(2)
+        frontier[i] = (cost, depth, state)
+        parentMap[state.board] = (parent, action)
+        heap.heapify(frontier)
+        
