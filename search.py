@@ -62,7 +62,7 @@ def depthFirstSearch(initialState):
         #print(curr)
         for neighbor, action in reversed(curr.nextStates()):
             if neighbor.board not in expntier:
-                expntier.add(curr.board)
+                expntier.add(neighbor.board)
                 forntier.append((neighbor, depth + 1))
                 parentMap[neighbor.board] = (curr.board, action)
 
