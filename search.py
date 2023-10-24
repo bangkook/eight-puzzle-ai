@@ -67,51 +67,70 @@ def depthFirstSearch(initial_state):
 
 def aStarSearch(initial_state, heuristic):
     frontier = []  # Priority queue (min-heap)
-    frontier_set = set()  # Set to check if a state is in the frontier
+    #frontier_set = set()  # Set to check if a state is in the frontier
     explore = set()
     parentM = dict()
     actions = list()
+    costs = dict()
     max_search_depth = 0
 
-    heap.heappush(frontier, (heuristic(initial_state.board), 0, initial_state))
-    frontier_set.add(initial_state.board)
-
+    heap.heappush(frontier, (0 + heuristic(initial_state.board), 0, initial_state)) # depth = cost
+    #frontier_set.add((initial_state.board, 0 + heuristic(initial_state.board)))
+    #print(frontier_set[state][0])
+    costs[initial_state.board] = 0 + heuristic(initial_state.board)
     while frontier:
+
         cost, current_depth, current_state = heap.heappop(frontier)
-        frontier_set.remove(current_state.board)
+        #frontier_set.remove((current_state.board, cost))
+        costs.pop(current_state.board, cost)
 
         max_search_depth = max(max_search_depth, current_depth)
-
+        #parentM[state.board] = (current_state.board, current_depth, action) #################################
         explore.add(current_state.board)
 
         if current_state.isGoal():
             return parentM, current_depth, explore, max_search_depth
 
         #print(currentState)
+
         for state, action in current_state.nextStates():
             new_depth = current_depth + 1
             new_cost = new_depth + heuristic(state.board)
 
-            if state.board not in frontier_set and state.board not in explore:
+            if state.board not in costs.keys() and state.board not in explore:
+ 
                 heap.heappush(frontier, (new_cost, new_depth, state))
-                frontier_set.add(state.board)
-                parentM[state.board] = (current_state.board, action)  # Store the parent state directly
+                #frontier_set.add((state.board, new_cost))
+                costs[state.board] = new_cost
+
+                parentM[state.board] = (current_state.board, current_depth, action)  # Store the parent state directly
                 max_search_depth = max(max_search_depth, new_depth)
-            elif state.board in frontier_set:
-                depth = decreaseKey(frontier, state, new_depth, new_cost, parentM, current_state.board, action)
-                max_search_depth = max(max_search_depth, new_depth)
+        
+            elif state.board in costs.keys():
+                
+                #depth = decreaseKey(frontier, state, new_depth, new_cost, parentM, current_state.board, action)
+                cost = costs[state.board]
+                if new_cost < cost:
+                    
+                    #frontier_set.remove(state.board)
+                    heap.heappush(frontier, (new_cost, new_depth, state))
+                    costs[state.board] = new_cost
+                    #frontier_set.add(initial_state.board)
+                    parentM[state.board] = (current_state.board, current_depth, action)
+                    max_search_depth = max(max_search_depth, new_depth)
+        
 
     return [], 1000000, explore, max_search_depth
 
 
-def decreaseKey(frontier, state, depth, cost, parentMap, parent, action):
-    for i, (c, d, s) in enumerate(frontier):
-        if s.board != state.board:
-            continue
-        if c <= cost :
-            return d
-        frontier[i] = (cost, depth, state)
-        parentMap[state.board] = (parent, action)
-        heap.heapify(frontier)
-        return depth
+# def decreaseKey(frontier, state, depth, cost, parentMap, parent, action):
+#     for i, (c, d, s) in enumerate(frontier):
+#         if s.board != state.board:
+#             continue
+#         if c <= cost :
+#             return d
+#         frontier[i] = (cost, depth, state)
+#         parentMap[state.board] = (parent, action)
+#         heap.heapify(frontier)
+#         return depth
         

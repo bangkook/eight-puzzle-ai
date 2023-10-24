@@ -1,1 +1,1 @@
-getPath
+euclideanHeuristic

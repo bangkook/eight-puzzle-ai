@@ -97,10 +97,16 @@ class EightPuzzleAgent:
         actions = []
         board = '012345678' #self.expandedNodes[-1]
         path.append(board)
-        while board in self.parentMap.keys():
-            board, action = self.parentMap[board]
-            path.append(board)
-            actions.append(action)
+        if(self.searchFunc.__name__ == "<lambda>"):
+            while board in self.parentMap.keys():
+                board,_,action = self.parentMap[board]
+                path.append(board)
+                actions.append(action)
+        else:
+            while board in self.parentMap.keys():
+                board,action = self.parentMap[board]
+                path.append(board)
+                actions.append(action)
         return path[::-1], actions[::-1] # reverse
 
     def getCost(self):
@@ -124,9 +130,9 @@ if __name__ == '__main__':
     puzzles = [[8, 0, 6, 5, 4, 7, 2, 3, 1], [ 1,2,5,3,4,0,6,7,8], [1,4,2,6,5,8,7,3,0], [1,0,2,7,5,4,8,6,3]]
     #function = breadthFirstSearch
     #function = aStarSearch
-    puzzle = [3, 2, 0, 4, 1, 5, 6, 7, 8]
+    puzzle = [8, 0, 6, 5, 4, 7, 2, 3, 1]
     state = EightPuzzleState(puzzle)
-    agent = EightPuzzleAgent(state, depthFirstSearch, manhattanHeuristic)
+    agent = EightPuzzleAgent(state, aStarSearch, euclideanHeuristic)
     path, actions = agent.getPath()
     cost = agent.getCost()
     expanded_nodes = len(agent.getExpandedNodes())

@@ -130,7 +130,7 @@ class TestEightPuzzle(unittest.TestCase):
         total_time = agent.getTime()
 
         self.assertEqual(cost, 8)
-        self.assertEqual(expanded_nodes, 13)
+        self.assertEqual(expanded_nodes, 11)
         self.assertEqual(depth, 8)
         self.assertEqual(actions, ['up', 'left', 'down', 'left', 'up', 'right', 'up', 'left'])
 
@@ -146,7 +146,7 @@ class TestEightPuzzle(unittest.TestCase):
         total_time = agent.getTime()
 
         self.assertEqual(cost, 8)
-        self.assertEqual(expanded_nodes, 13)
+        self.assertEqual(expanded_nodes, 11)
         self.assertEqual(depth, 8)
         self.assertEqual(actions, ['up', 'left', 'down', 'left', 'up', 'right', 'up', 'left'])
 
