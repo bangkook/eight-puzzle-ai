@@ -122,7 +122,7 @@ class EightPuzzleApp:
 
             self.results_label.config(text=f"Cost = {cost}, Expanded Nodes = {len(expanded_nodes)}, Search Depth = {depth}, Time = {time}")
         else:
-            messagebox.showerror("unsolvable","ya alel el adab")
+            messagebox.showerror("unsolvable","This puzzle is unsolvable")
 
     def get_solution_path(self, parent, initial_state):
         path = []
