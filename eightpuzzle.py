@@ -26,9 +26,9 @@ class EightPuzzleState:
 
         # List of tuples (state, direction)
         nextStates = []
-        directions = ['up', 'down', 'left', 'right']
-        dx = [-1, 1, 0, 0]
-        dy = [0, 0, -1, 1]
+        directions = ['left', 'right', 'up', 'down']
+        dx = [0, 0, -1, 1]
+        dy = [-1, 1, 0, 0]
         for i in range(len(directions)):
             newX = x + dx[i]
             newY = y + dy[i]
@@ -83,18 +83,6 @@ def solvable(puzzle):
 
     return inversion_count % 2 == 0
 
-class EightPuzzleGame:
-    def __init__(self, initialState):
-        self.initialState = initialState
-  
-    def getNeighbours(self, state):
-        return state.nextStates()
-
-    def getInitialState(self):
-        return self.initialState
-
-    def isGoalState(self, state):
-        return state.isGoal()
 
 class EightPuzzleAgent:
     def __init__(self, initialState, fn, heuristic=lambda x : 0):
@@ -139,7 +127,17 @@ if __name__ == '__main__':
     puzzles = [[8, 0, 6, 5, 4, 7, 2, 3, 1], [ 1,2,5,3,4,0,6,7,8], [1,4,2,6,5,8,7,3,0], [1,0,2,7,5,4,8,6,3]]
     #function = breadthFirstSearch
     #function = aStarSearch
-    
+    puzzle = [3, 2, 0, 4, 1, 5, 6, 7, 8]
+    state = EightPuzzleState(puzzle)
+    agent = EightPuzzleAgent(state, depthFirstSearch, manhattanHeuristic)
+    path, actions = agent.getPath()
+    cost = agent.getCost()
+    expanded_nodes = len(agent.getExpandedNodes())
+    depth = agent.getDepth()
+    print(actions)
+    print(expanded_nodes)
+    print(cost)
+    print(depth)
         
 
     
