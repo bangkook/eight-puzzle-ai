@@ -4,12 +4,12 @@ from search import *
 from heuristics import *
 
 class EightPuzzleState:
-    def __init__(self, puzzle): # puzzle is 1d for simplicity, convert to 2d in init
+    def __init__(self, puzzle): # puzzle is 1d array for simplicity, convert to string in init
         self.board = ""
         for i in range(9):
             self.board = self.board + str(puzzle[i])
             if(puzzle[i] == 0):
-                self.blankPosition = i
+                self.blank_position = i
 
     # Check if given coordinates are valid
     def _isValid(self, x, y):
@@ -17,15 +17,16 @@ class EightPuzzleState:
 
     def __lt__(self, other):
         return True
+
     def nextStates(self):
         """
             Returns list of next (state, move) for this state.
         """
-        x = self.blankPosition // 3
-        y = self.blankPosition % 3
+        x = self.blank_position // 3
+        y = self.blank_position % 3
 
         # List of tuples (state, direction)
-        nextStates = []
+        next_states = []
         directions = ['left', 'right', 'up', 'down']
         dx = [0, 0, -1, 1]
         dy = [-1, 1, 0, 0]
@@ -33,23 +34,19 @@ class EightPuzzleState:
             newX = x + dx[i]
             newY = y + dy[i]
             if(self._isValid(newX, newY)):
-                nextStates.append((self._applyMove(3 * newX + newY), directions[i]))
+                next_states.append((self._applyMove(3 * newX + newY), directions[i]))
         
-        return nextStates
+        return next_states
 
     # Return a new state after changing the blank's cell position to (newX, newY)
     def _applyMove(self, newPos):
-        newState = EightPuzzleState([0]*9)
-        puzzle = list(self.board) 
-        pos = self.blankPosition
-    
-        puzzle[newPos] = self.board[pos]
-        puzzle[pos] = self.board[newPos]
+        pos = self.blank_position
 
-        newState.board = ''.join(puzzle)
-        newState.blankPosition = newPos
+        puzzle = [int(self.board[i]) for i in range(9)]
+        puzzle[newPos] = int(self.board[pos])
+        puzzle[pos] = int(self.board[newPos])
 
-        return newState
+        return EightPuzzleState(puzzle)
         
     # A goal is reached when the cell value equals the cell index in 1d array
     def isGoal(self):
