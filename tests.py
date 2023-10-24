@@ -55,6 +55,36 @@ class TestEightPuzzle(unittest.TestCase):
         'right', 'right', 'down', 'left', 'left', 'up', 'right', 'right', 'down', 
         'left', 'left', 'up'])
 
+    def test_dfs_small(self):
+        state = EightPuzzleState([1,2,5,6,3,4,7,8,0])
+
+        agent = EightPuzzleAgent(state, dfs)
+        path, actions = agent.getPath()
+        cost = agent.getCost()
+        expanded_nodes = len(agent.getExpandedNodes())
+        depth = agent.getDepth()
+        total_time = agent.getTime()
+
+        self.assertEqual(cost, 8)
+        self.assertEqual(expanded_nodes, 9)
+        self.assertEqual(depth, 8)
+        self.assertEqual(actions, ['left', 'left', 'up', 'right', 'right', 'up', 'left', 'left'])
+
+    def test_bfs_small(self):
+        state = EightPuzzleState([1,2,5,6,3,4,7,8,0])
+
+        agent = EightPuzzleAgent(state, bfs)
+        path, actions = agent.getPath()
+        cost = agent.getCost()
+        expanded_nodes = len(agent.getExpandedNodes())
+        depth = agent.getDepth()
+        total_time = agent.getTime()
+
+        self.assertEqual(cost, 8)
+        self.assertEqual(expanded_nodes, 153)
+        self.assertEqual(depth, 8)
+        self.assertEqual(actions, ['left', 'left', 'up', 'right', 'right', 'up', 'left', 'left'])
+
     def test_astar_man_puzzle1(self):
         state = EightPuzzleState(puzzles[0])
 
@@ -172,6 +202,23 @@ class TestEightPuzzle(unittest.TestCase):
         self.assertEqual(actions, ['right', 'down', 'left', 'down', 'right', 'up', 
         'left', 'down', 'left', 'up', 'right', 'right', 'up', 'left', 'left', 'down', 
         'right', 'right', 'down', 'left', 'left', 'up', 'up'])
+
+    def test_dfs_puzzle3(self):
+        state = EightPuzzleState(puzzles[2])
+        total_time = 0
+        cost = depth = expanded_nodes = 0
+        path, actions = None, None
+
+        agent = EightPuzzleAgent(state, dfs)
+        path, actions = agent.getPath()
+        cost = agent.getCost()
+        expanded_nodes = len(agent.getExpandedNodes())
+        depth = agent.getDepth()
+        total_time += agent.getTime()
+
+        self.assertEqual(cost, 64787)
+        self.assertEqual(depth, 66056)
+        self.assertEqual(expanded_nodes,106047)
 
     def test_astar_man_puzzle3(self):
         state = EightPuzzleState(puzzles[2])
